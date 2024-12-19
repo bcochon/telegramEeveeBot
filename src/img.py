@@ -21,7 +21,7 @@ def get_today_img() :
     today = (date.today()).isoformat()
     validImgs = list(filter(lambda img: (imgs_dict[img] == today), list(imgs_dict.keys())))
     if validImgs:
-        img = random.choice(list(imgs_dict.keys()))
+        img = random.choice(validImgs)
         path = f'../{imgsDir}/{img}'
         year = imgs_dict[img].split('-')[0]
         return [path, year]
