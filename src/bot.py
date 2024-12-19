@@ -7,6 +7,7 @@ import telebot
 import params as ps
 import utils
 from img import get_img
+from img import get_today_img
 from img import try_download_pic
 from img import try_download
 from user_handler import check_banned
@@ -17,13 +18,22 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+# Definir comandos
 commands = {
-    'start'         : 'Saludo amigable 🤩',
+    'start'         : 'Empezar a usar el bot 🤩',
     'help'          : 'Conocer los comandos disponibles 🤓',
-    'eevee'         : 'Para lo que vinimos 🙏',
+    'eevee'         : 'Pedir foto de Eevee 🙏',
+    'eeveehoy'      : 'Pedir foto de Eevee un día como hoy',
     'togglemute'    : 'Para activar/desactivar las respuestas si no entiendo un mensaje 🧐'
 }
+commandsList = utils.commands_list(commands)
+bot.delete_my_commands(scope=None, language_code=None)
+bot.set_my_commands(commands=commandsList)
 
+print("Bot Online")
+
+
+# Message handlers
 # Test
 @bot.message_handler(commands=['test'])
 def test(message):
@@ -70,6 +80,7 @@ def command_help(message):
     bot.send_message(
         cid, 
         telebot.formatting.format_text(
+            "Este bot permite obtener imágenes de Eevee de una amplia galería con más de 100 fotos\\! 😮",
             help_text,
             ban_info,
             separator="\n" # separator separates all strings
@@ -97,12 +108,36 @@ def command_mute(message):
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
+    mid = message.message_id
     args = message.text.split()
     if len(args) > 1:
         img = get_img(args[1])
     else:
         img = get_img('')
-    bot.send_photo(cid, open(img,'rb'))
+    try:
+        bot.send_chat_action(cid, 'typing')
+        print(f'Enviando imagen {img} a usuario {cid}...')
+        bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
+    except:
+        print('Error al enviar {img} a usuario {cid}...')
+        bot.reply_to(message, "Ups, hubo un problema 😔")
+
+# Pedir foto hoy
+@bot.message_handler(commands=['eeveehoy'])
+def command_eeveeToday(message):
+    cid = message.chat.id
+    mid = message.message_id
+    img = get_today_img()
+    if img:
+        try:
+            bot.send_chat_action(cid, 'typing')
+            print(f'Enviando imagen {img} a usuario {cid}...')
+            bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
+        except:
+            print('Error al enviar {img} a usuario {cid}...')
+            bot.reply_to(message, "Ups, hubo un problema 😔")
+    else:
+        bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
 
 # Subir foto
 @bot.message_handler(commands=['upload'], func=lambda msg: msg.from_user.username == ps.botOwner)
@@ -125,6 +160,29 @@ def command_uploaded(message):
     bot.reply_to(message, result)
     utils.set_user_step(uid, 0)
 
+# Finalizar ejecución
+@bot.message_handler(commands=['q'], func=lambda msg: msg.from_user.username == ps.botOwner)
+def command_quit(message):
+    cid = message.chat.id
+    uid = message.from_user.id
+    bot.send_message(cid, "Envía y para finalizar")
+    utils.set_user_step(uid, 2)
+
+@bot.message_handler(func=lambda msg:  utils.get_user_step(msg.from_user.id) == 2)
+def command_quitted(message):
+    cid = message.chat.id
+    uid = message.from_user.id
+    utils.set_user_step(uid, 0)
+    if message.text.lower() == 'y':
+        try:
+            bot.send_message(cid, "Finalizando ejecución...")
+            bot.stop_bot()
+            print("Ejecución finalizada")
+        except:
+            print("No se pudo finalizar la ejecución")
+    else:
+        bot.reply_to(message, "Finalización de ejecución cancelada")
+
 # Default
 @bot.message_handler(func=lambda msg: (not utils.is_answering_pic(msg)) and (not ps.muteStatus))
 def command_default(message):
@@ -136,7 +194,6 @@ def command_default(message):
 def command_default(message):
     bot.reply_to(message, "Qué me mandaba \\(?")
     check_spam(message.from_user.id)
-
 
 
 bot.infinity_polling()

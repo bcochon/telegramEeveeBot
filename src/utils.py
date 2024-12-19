@@ -1,7 +1,15 @@
+from telebot import types as tele_types
 from user_handler import users
 from user_handler import register_user
 
+
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
+
+def commands_list(commands) :
+    list = []
+    for key in commands:
+        list.append(tele_types.BotCommand(key, commands[key]))
+    return list
 
 def is_answering_pic(message) :
     if message.reply_to_message:

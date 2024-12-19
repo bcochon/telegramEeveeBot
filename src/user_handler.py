@@ -16,7 +16,6 @@ class CustomUserInfo:
 
     def count_msg(self):
         self.spamCount += 1
-        print(f"Spam count de usuario {self.uid} : {self.spamCount}")
         if self.spamCount > 6:
             self.ban(60)
         thread = threading.Thread(target=self.uncount_msg)
