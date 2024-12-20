@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 
 import telebot
 
-import params as ps
-import utils
+from params import *
+from utils import *
+import commands
 from img import get_img
 from img import get_today_img
 from img import try_download_pic
@@ -19,16 +20,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Definir comandos
-commands = {
-    'start'         : 'Empezar a usar el bot 🤩',
-    'help'          : 'Conocer los comandos disponibles 🤓',
-    'eevee'         : 'Pedir foto de Eevee 🙏',
-    'eeveehoy'      : 'Pedir foto de Eevee un día como hoy',
-    'togglemute'    : 'Para activar/desactivar las respuestas si no entiendo un mensaje 🧐'
-}
-commandsList = utils.commands_list(commands)
-bot.delete_my_commands(scope=None, language_code=None)
-bot.set_my_commands(commands=commandsList)
+commands.set_commands(bot)
 
 print("Bot Online")
 
@@ -37,7 +29,7 @@ print("Bot Online")
 # Test
 @bot.message_handler(commands=['test'])
 def test(message):
-    utils.print_message(message)
+    print_message(message)
 
 # Control de spam
 @bot.message_handler(func=lambda msg: check_banned(msg.from_user.id))
@@ -47,22 +39,22 @@ def warn_ban(message):
     bot.send_message(cid, text="Para más info, escribí /help")
 
 # Modo Debug
-@bot.message_handler(func=lambda msg: ps.debugginMode and msg.from_user.username != ps.botOwner)
+@bot.message_handler(func=lambda msg: debugginMode and not from_bot_owner(msg))
 def warn_debug(message):
     bot.reply_to(message, "El bot se encuentra en mantenimiento ahora mismo 😬. Intentá de nuevo más tarde 😔")
     check_spam(message.from_user.id)
 
 # Toggle Modo Debug
-@bot.message_handler(commands=['toggleDebug'], func=lambda msg: msg.from_user.username == ps.botOwner)
+@bot.message_handler(commands=['toggleDebug'], func=lambda msg: from_bot_owner(msg))
 def command_debug(message):
-    ps.debugginMode = not ps.debugginMode
-    if ps.debugginMode :
+    debugginMode = not debugginMode
+    if debugginMode :
         bot.reply_to(message, "Modo debug activado")
     else :
         bot.reply_to(message, "Modo debug desactivado")
 
 # Usuarios baneados
-@bot.message_handler(func=lambda msg: msg.from_user.id in ps.bannedUsers)
+@bot.message_handler(func=lambda msg: msg.from_user.id in bannedUsers)
 def reject_user(message):
     cid = message.chat.id
     username = message.from_user.username
@@ -98,8 +90,8 @@ def command_start(message):
 # Mute
 @bot.message_handler(commands=['togglemute'])
 def command_mute(message):
-    ps.muteStatus = not ps.muteStatus
-    if ps.muteStatus :
+    muteStatus = not muteStatus
+    if muteStatus :
         bot.reply_to(message, "🤐")
     else :
         bot.reply_to(message, "We're so back 🤩")
@@ -119,7 +111,7 @@ def command_eevee(message):
         print(f'Enviando imagen {img} a usuario {cid}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
     except:
-        print('Error al enviar {img} a usuario {cid}...')
+        print(f'Error al enviar {img} a usuario {cid}...')
         bot.reply_to(message, "Ups, hubo un problema 😔")
 
 # Pedir foto hoy
@@ -140,14 +132,14 @@ def command_eeveeToday(message):
         bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
 
 # Subir foto
-@bot.message_handler(commands=['upload'], func=lambda msg: msg.from_user.username == ps.botOwner)
+@bot.message_handler(commands=['upload'], func=lambda msg: from_bot_owner(msg))
 def command_upload(message):
     cid = message.chat.id
     uid = message.from_user.id
     bot.send_message(cid, "Envía la imagen a añadir a la galería")
-    utils.set_user_step(uid, 1)
+    set_user_step(uid, 1)
 
-@bot.message_handler(content_types=utils.ALLSCP, func=lambda msg:  utils.get_user_step(msg.from_user.id) == 1)
+@bot.message_handler(content_types=ALLSCP, func=lambda msg:  get_user_step(msg.from_user.id) == 1)
 def command_uploaded(message):
     cid = message.chat.id
     uid = message.from_user.id
@@ -158,22 +150,22 @@ def command_uploaded(message):
     else:
         result = "Creo que eso no es una foto... cancelando operación"
     bot.reply_to(message, result)
-    utils.set_user_step(uid, 0)
+    set_user_step(uid, 0)
 
 # Finalizar ejecución
-@bot.message_handler(commands=['q'], func=lambda msg: msg.from_user.username == ps.botOwner)
+@bot.message_handler(commands=['q'], func=lambda msg: from_bot_owner(msg))
 def command_quit(message):
     cid = message.chat.id
     uid = message.from_user.id
-    bot.send_message(cid, "Envía y para finalizar")
-    utils.set_user_step(uid, 2)
+    bot.send_message(cid, "Envía /confirm para finalizar")
+    set_user_step(uid, 2)
 
-@bot.message_handler(func=lambda msg:  utils.get_user_step(msg.from_user.id) == 2)
+@bot.message_handler(func=lambda msg:  get_user_step(msg.from_user.id) == 2)
 def command_quitted(message):
     cid = message.chat.id
     uid = message.from_user.id
-    utils.set_user_step(uid, 0)
-    if message.text.lower() == 'y':
+    set_user_step(uid, 0)
+    if message.text.lower() == '/confirm':
         try:
             bot.send_message(cid, "Finalizando ejecución...")
             bot.stop_bot()
@@ -184,13 +176,13 @@ def command_quitted(message):
         bot.reply_to(message, "Finalización de ejecución cancelada")
 
 # Default
-@bot.message_handler(func=lambda msg: (not utils.is_answering_pic(msg)) and (not ps.muteStatus))
+@bot.message_handler(func=lambda msg: (not is_answering_pic(msg)) and (not muteStatus))
 def command_default(message):
     bot.reply_to(message, "No sé qué dijiste jeje ni idea. Usa /help para saber qué preguntarme 🤩")
     check_spam(message.from_user.id)
 
 # Default (no texto)
-@bot.message_handler(content_types=utils.ALLSCP, func=lambda msg: (not utils.is_answering_pic(msg)) and (not ps.muteStatus))
+@bot.message_handler(content_types=ALLSCP, func=lambda msg: (not is_answering_pic(msg)) and (not muteStatus))
 def command_default(message):
     bot.reply_to(message, "Qué me mandaba \\(?")
     check_spam(message.from_user.id)

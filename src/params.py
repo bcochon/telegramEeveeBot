@@ -1,9 +1,10 @@
+DEFAULT_LANG = 'es'
 bannedUsers = []
 debugginMode = False
-botOwner = "bruno_xc"
+BOT_OWNER = 6390834871
 muteStatus = False
-imgsDir = "imgs"
-maxFileSize = 10 * 10**6 # 10MB
-newImagePrefix = "imagenCargadaPorBot-"
-newImageSufix = ".jpg"
-newImageIndexPath = "new_image_index"
+IMGS_DIR = "imgs"
+MAX_FILE_SIZE = 10 * 10**6 # 10MB
+NEW_IMG_PREFIX = "imagenCargadaPorBot-"
+NEW_IMG_SUFIX = ".jpg"
+NEW_IMG_INDEX_PATH = "new_image_index"
