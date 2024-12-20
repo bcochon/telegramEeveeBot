@@ -4,7 +4,6 @@ from params import imgsDir
 
 currdir = os.getcwd()
 path = os.path.join(currdir.removesuffix('src'), imgsDir)
-print(path)
 
 sh=win32com.client.gencache.EnsureDispatch('Shell.Application',0)
 ns = sh.NameSpace(path)

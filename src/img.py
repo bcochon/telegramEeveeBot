@@ -19,7 +19,7 @@ def get_img(name) :
 
 def get_today_img() :
     today = (date.today()).isoformat()
-    validImgs = list(filter(lambda img: (imgs_dict[img] == today), list(imgs_dict.keys())))
+    validImgs = list(filter(lambda img: (imgs_dict[img] == today and newImagePrefix not in img), list(imgs_dict.keys())))
     if validImgs:
         img = random.choice(validImgs)
         path = f'../{imgsDir}/{img}'
