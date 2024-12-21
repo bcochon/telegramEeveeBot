@@ -1,6 +1,8 @@
 import time
 import threading
 
+from utils import logger
+
 users = {}
 
 class CustomUserInfo:
@@ -27,7 +29,7 @@ class CustomUserInfo:
 
     def ban(self, banTime):
         self.banned = True
-        print(f"Baneado usuario {self.uid}")
+        logger.info(f"Baneado usuario {self.uid}")
         thread = threading.Thread(target=self.unban, args=(banTime,))
         thread.start()
 

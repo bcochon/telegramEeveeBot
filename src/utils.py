@@ -1,7 +1,13 @@
 from telebot import types as tele_types
+import logging
+import logging.config
 from params import BOT_OWNER
+from params import LOGGER_CONFIG_PATH
 from datetime import datetime
 from time import time
+
+logging.config.fileConfig(LOGGER_CONFIG_PATH)
+logger = logging.getLogger('EeveeBot')
 
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
 

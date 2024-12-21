@@ -24,14 +24,14 @@ bot = telebot.TeleBot(BOT_TOKEN)
 # Definir comandos
 commands.set_commands(bot)
 
-print("Bot Online")
+logger.info("Bot Online")
 
 
 # Message handlers
 # Ignorar mensajes antiguos
 @bot.message_handler(func=lambda msg: sent_secs_ago(msg, 10))
 def ignore(message):
-    logger.debug("Ignorado el siguiente mensaje: ")
+    logger.debug(f"Ignorado el siguiente mensaje:")
     print_message(message)
 
 # Test
@@ -120,10 +120,10 @@ def command_eevee(message):
         img = get_img('')
     try:
         bot.send_chat_action(cid, 'typing')
-        print(f'Enviando imagen {img} a usuario {cid}...')
+        logger.debug(f'Enviando imagen {img} a usuario {cid}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
     except:
-        print(f'Error al enviar {img} a usuario {cid}...')
+        logger.error(f'Error al enviar {img} a usuario {cid}...')
         bot.reply_to(message, "Ups, hubo un problema 😔")
 
 # Pedir foto hoy
@@ -136,10 +136,10 @@ def command_eeveeToday(message):
     if img:
         try:
             bot.send_chat_action(cid, 'typing')
-            print(f'Enviando imagen {img} a usuario {cid}...')
+            logger.debug(f'Enviando imagen {img} a usuario {cid}...')
             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
         except:
-            print('Error al enviar {img} a usuario {cid}...')
+            logger.error('Error al enviar {img} a usuario {cid}...')
             bot.reply_to(message, "Ups, hubo un problema 😔")
     else:
         bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
@@ -183,9 +183,9 @@ def command_quitted(message):
         try:
             bot.send_message(cid, "Finalizando ejecución...")
             bot.stop_bot()
-            print("Ejecución finalizada")
+            logger.debug("Finalizando ejecución...")
         except:
-            print("No se pudo finalizar la ejecución")
+            logger.error("No se pudo finalizar la ejecución")
     else:
         bot.reply_to(message, "Finalización de ejecución cancelada")
 
@@ -203,3 +203,4 @@ def command_default(message):
 
 
 bot.infinity_polling()
+logger.info("Ejecución finalizada...")

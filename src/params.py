@@ -1,4 +1,5 @@
 DEFAULT_LANG = 'es'
+LOGGER_CONFIG_PATH = '../logs/.conf'
 bannedUsers = []
 debugginMode = False
 BOT_OWNER = 6390834871

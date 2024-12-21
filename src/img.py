@@ -2,6 +2,7 @@ import random
 import pickle
 from datetime import date
 
+from utils import logger
 from params import IMGS_DIR
 from params import MAX_FILE_SIZE
 from params import NEW_IMG_PREFIX
@@ -59,7 +60,7 @@ def download_pic(name, pic) :
     path = IMGS_DIR + '/' + name
     with open(path, 'wb') as new_file:
         new_file.write(pic)
-    print(f"Guardada imagen {path}\n")
+    logger.info(f"Guardada imagen {path}\n")
 
 def try_download(file, bot) :
     if not is_valid_pic(file) :

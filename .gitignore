@@ -1,5 +1,6 @@
-# Imagenes
+# Carpetas ignoradas
 imgs/
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
