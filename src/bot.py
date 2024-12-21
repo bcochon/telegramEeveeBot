@@ -188,9 +188,16 @@ def command_quitted(message):
     else:
         bot.reply_to(message, "Finalización de ejecución cancelada")
 
+# Hola
+@bot.message_handler(func=lambda msg: msg.text.lower() == 'hola')
+def command_hola(message):
+    username = name_from_user(message.from_user) 
+    bot.reply_to(message, f"Hola {username} 🤙")
+    check_spam(message.from_user.id)
+
 # Default
 @bot.message_handler(func=lambda msg: (not is_answering_pic(msg)) and (not muteStatus))
-def command_default(message):
+def command_default_msg(message):
     bot.reply_to(message, "No sé qué dijiste jeje ni idea. Usa /help para saber qué preguntarme 🤩")
     check_spam(message.from_user.id)
 
