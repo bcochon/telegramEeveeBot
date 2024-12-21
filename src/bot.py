@@ -33,7 +33,7 @@ def ignore(message):
     print_message(message)
 
 # Test
-@bot.message_handler(commands=['test'])
+@bot.message_handler(commands=['test', 't'])
 def test(message):
     print_message(message)
 
@@ -67,28 +67,31 @@ def warn_ban(message):
     bot.send_message(cid, text="Para más info, escribí /help")
 
 # Help
-@bot.message_handler(commands=['help'])
+@bot.message_handler(commands=['help', 'h'])
 def command_help(message):
     cid = message.chat.id
+    lang = message.from_user.language_code
+    cms = commands.commands_langs[lang]
     help_text = "Estos son los comandos que podés usar: \n"
-    for key in commands:  # generate help text out of the commands dictionary defined at the top
-        help_text += "/" + key + ": "
-        help_text += commands[key] + "\n"
-    ban_info = "Tené en cuenta que si interactuás con el bot en exceso \\(exceptuando comando /eevee\\), serás baneado por 60 segundos"
+    for key in cms:  # generate help text out of the commands dictionary defined at the top
+        help_text += "/" + key + " — "
+        help_text += cms[key] + "\n"
     bot.send_message(
         cid, 
         telebot.formatting.format_text(
-            "Este bot permite obtener imágenes de Eevee de una amplia galería con más de 100 fotos\\! 😮",
+            "Bienvenido a *EeveeBot*\\. Este bot permite obtener imágenes de Eevee de una amplia galería con más de 100 fotos\\! 😮\n",
             help_text,
-            ban_info,
+            "Tené en cuenta que si interactuás con el bot en exceso \\(exceptuando comando /eevee\\), serás baneado por 60 segundos\\.\n",
+            "Podés encontrar el [código](https://github.com/bcochon/telegramEeveeBot) detrás de este bot acá",
             separator="\n" # separator separates all strings
         ),
-        parse_mode='MarkdownV2'
+        parse_mode='MarkdownV2',
+        link_preview_options=tele_types.LinkPreviewOptions(is_disabled=True)
     )  # send the generated help page
     check_spam(message.from_user.id)
 
 # Start
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 's'])
 def command_start(message):
     bot.reply_to(message, "Bienvenido jeje")
     command_help(message)

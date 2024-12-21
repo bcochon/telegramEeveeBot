@@ -9,11 +9,11 @@ privileged_commands = {
 }
 
 commands_es = {
-    'start'         : 'Empezar a usar el bot 🤩',
-    'help'          : 'Conocer los comandos disponibles 🤓',
-    'eevee'         : 'Pedir foto de Eevee 🙏',
-    'eeveehoy'      : 'Pedir foto de Eevee un día como hoy',
-    'togglemute'    : 'Para activar/desactivar las respuestas si no entiendo un mensaje 🧐'
+    'start'         : 'empezar a usar el bot 🤩',
+    'help'          : 'conocer los comandos disponibles 🤓',
+    'eevee'         : 'pedir foto de Eevee 🙏',
+    'eeveehoy'      : 'pedir foto de Eevee un día como hoy',
+    'togglemute'    : 'para ignorar mensajes que no entendí 🧐'
 }
 
 commands_langs = {
