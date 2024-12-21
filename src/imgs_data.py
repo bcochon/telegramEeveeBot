@@ -3,7 +3,7 @@ import win32com.client
 from params import IMGS_DIR
 
 currdir = os.getcwd()
-path = os.path.join(currdir.removesuffix('src'), IMGS_DIR)
+path = os.path.join(currdir.removesuffix('src'), IMGS_DIR.removeprefix('../'))
 
 sh=win32com.client.gencache.EnsureDispatch('Shell.Application',0)
 ns = sh.NameSpace(path)

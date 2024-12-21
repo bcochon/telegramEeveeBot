@@ -15,14 +15,14 @@ def get_img(name) :
         img = name
     else:
         img = random.choice(list(imgs_dict.keys()))
-    return f'../{IMGS_DIR}/{img}'
+    return f'{IMGS_DIR}/{img}'
 
 def get_today_img() :
     today = (date.today()).isoformat()
     validImgs = list(filter(lambda img: (imgs_dict[img] == today and NEW_IMG_PREFIX not in img), list(imgs_dict.keys())))
     if validImgs:
         img = random.choice(validImgs)
-        path = f'../{IMGS_DIR}/{img}'
+        path = f'{IMGS_DIR}/{img}'
         year = imgs_dict[img].split('-')[0]
         return [path, year]
     return []
