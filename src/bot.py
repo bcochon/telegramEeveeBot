@@ -33,12 +33,13 @@ def ignore(message):
     user = user_from_message(message)
     date = message_date_string(message)
     logger.debug(f"Ignorado mensaje de usuario {user} del {date}")
-    print_message(message)
+    loggerIgnore.debug('\n'+message_info_string(message))
 
 # Test
 @bot.message_handler(commands=['test', 't'])
 def test(message):
-    print_message(message)
+    info = message_info_string(message)
+    print(info)
 
 # Modo Debug
 @bot.message_handler(func=lambda msg: debugginMode and not from_bot_owner(msg))

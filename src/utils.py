@@ -8,6 +8,7 @@ from time import time
 
 logging.config.fileConfig(LOGGER_CONFIG_PATH)
 logger = logging.getLogger('EeveeBot')
+loggerIgnore = logging.getLogger('Ignore')
 
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
 
@@ -37,15 +38,25 @@ def name_from_user(user) :
     if name: return name
     return ''
 
-def print_message(message) :
+def message_info(message) :
     user = message.from_user
     date = message_date_string(message)
-    print(f'User ID:   {user.id}')
-    print(f'User:      {user.first_name} {user.last_name}')
-    print(f'Username:  {user.username}')
-    print(f'Language:  {user.language_code}')
-    print(f'Message:   {message.text}' )
-    print(f'Date:      {date}')
+    info = {
+        'UserID':    user.id,
+        'User':      user.first_name+user.last_name,
+        'Username':  user.username,
+        'Language':  user.language_code,
+        'Message':   message.text,
+        'Date':      date
+    }
+    return info
+
+def message_info_string(message):
+    info = message_info(message)
+    info_string = ''
+    for key in info:
+        info_string += f'{key}: {info[key]}\n'
+    return info_string
 
 def from_bot_owner(message) :
     return message.from_user.id == BOT_OWNER
