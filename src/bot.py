@@ -26,17 +26,16 @@ print("Bot Online")
 
 
 # Message handlers
+# Ignorar mensajes antiguos
+@bot.message_handler(func=lambda msg: sent_secs_ago(msg, 10))
+def ignore(message):
+    logger.debug("Ignorado el siguiente mensaje: ")
+    print_message(message)
+
 # Test
 @bot.message_handler(commands=['test'])
 def test(message):
     print_message(message)
-
-# Control de spam
-@bot.message_handler(func=lambda msg: check_banned(msg.from_user.id))
-def warn_ban(message):
-    cid = message.from_user.id
-    bot.send_message(cid, text="Enviaste muchos mensajes en poco tiempo 🤡, estás baneado por 60 segundos 🙃")
-    bot.send_message(cid, text="Para más info, escribí /help")
 
 # Modo Debug
 @bot.message_handler(func=lambda msg: debugginMode and not from_bot_owner(msg))
@@ -59,6 +58,13 @@ def reject_user(message):
     cid = message.chat.id
     username = message.from_user.username
     bot.send_message(cid, f'El usuario {username} está baneadísimo ETERNAMENTE. Imposible que le dirija la palabra ❌')
+
+# Control de spam
+@bot.message_handler(func=lambda msg: check_banned(msg.from_user.id))
+def warn_ban(message):
+    cid = message.from_user.id
+    bot.send_message(cid, text="Enviaste muchos mensajes en poco tiempo 🤡, estás baneado por 60 segundos 🙃")
+    bot.send_message(cid, text="Para más info, escribí /help")
 
 # Help
 @bot.message_handler(commands=['help'])

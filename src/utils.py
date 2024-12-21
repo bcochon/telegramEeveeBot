@@ -12,6 +12,10 @@ def is_answering_pic(message) :
         if ansTo.photo:
             return True
         return False
+    
+def sent_secs_ago(message, secs) :
+    time_since_mesage = int(time()) - message.date
+    return time_since_mesage > secs
 
 def print_message(message) :
     user = message.from_user
