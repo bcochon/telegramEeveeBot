@@ -109,6 +109,7 @@ def command_mute(message):
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
+    bot.send_chat_action(cid, 'upload_photo', timeout=90)
     mid = message.message_id
     args = message.text.split()
     if len(args) > 1:
@@ -127,6 +128,7 @@ def command_eevee(message):
 @bot.message_handler(commands=['eeveehoy'])
 def command_eeveeToday(message):
     cid = message.chat.id
+    bot.send_chat_action(cid, 'upload_photo', timeout=90)
     mid = message.message_id
     img = get_today_img()
     if img:
@@ -151,6 +153,7 @@ def command_upload(message):
 @bot.message_handler(content_types=ALLSCP, func=lambda msg:  get_user_step(msg.from_user.id) == 1)
 def command_uploaded(message):
     cid = message.chat.id
+    bot.send_chat_action(cid, 'typing', timeout=90)
     uid = message.from_user.id
     if message.photo:
         result = try_download_pic(message.photo, bot)
