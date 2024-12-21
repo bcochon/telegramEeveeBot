@@ -1,6 +1,4 @@
 from telebot import types as tele_types
-from user_handler import users
-from user_handler import register_user
 from params import BOT_OWNER
 from datetime import datetime
 from time import time
@@ -30,12 +28,3 @@ def print_message(message) :
 
 def from_bot_owner(message) :
     return message.from_user.id == BOT_OWNER
-
-def get_user_step(uid):
-    if uid not in users:
-        register_user(uid)
-        print(f"New user {uid} detected, who hasn't used \"/start\" yet")
-    return users[uid].step
-
-def set_user_step(uid, step):
-    users[uid].step = step

@@ -49,3 +49,12 @@ def check_spam(id):
 
 def check_banned(id):
     return register_user(id).banned
+
+def get_user_step(uid):
+    if uid not in users:
+        register_user(uid)
+        logger.debug(f"New user {uid} detected, who hasn't used \"/start\" yet")
+    return users[uid].step
+
+def set_user_step(uid, step):
+    users[uid].step = step

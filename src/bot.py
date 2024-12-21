@@ -13,6 +13,8 @@ from img import try_download_pic
 from img import try_download
 from user_handler import check_banned
 from user_handler import check_spam
+from user_handler import get_user_step
+from user_handler import set_user_step
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
