@@ -209,4 +209,5 @@ def command_default(message):
 
 
 bot.infinity_polling()
-logger.info("Ejecución finalizada...")
+logger.info("Ejecución finalizada")
+commands.set_offline(bot)
