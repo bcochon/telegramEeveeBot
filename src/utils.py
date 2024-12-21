@@ -22,9 +22,18 @@ def sent_secs_ago(message, secs) :
     time_since_mesage = int(time()) - message.date
     return time_since_mesage > secs
 
+def message_date_string(message) :
+    return datetime.fromtimestamp(message.date).strftime('%d-%m-%Y %H:%M:%S')
+
+def user_from_message(message) :
+    user = message.from_user.username
+    if user:
+        return user
+    return message.chat.id
+
 def print_message(message) :
     user = message.from_user
-    date = datetime.fromtimestamp(message.date).strftime('%d-%m-%Y %H:%M:%S')
+    date = message_date_string(message)
     print(f'User ID:   {user.id}')
     print(f'User:      {user.first_name} {user.last_name}')
     print(f'Username:  {user.username}')

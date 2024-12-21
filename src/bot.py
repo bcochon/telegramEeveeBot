@@ -1,5 +1,4 @@
 import os
-
 from dotenv import load_dotenv
 
 import telebot
@@ -31,7 +30,9 @@ logger.info("Bot Online")
 # Ignorar mensajes antiguos
 @bot.message_handler(func=lambda msg: sent_secs_ago(msg, 10))
 def ignore(message):
-    logger.debug(f"Ignorado el siguiente mensaje:")
+    user = user_from_message(message)
+    date = message_date_string(message)
+    logger.debug(f"Ignorado mensaje de usuario {user} del {date}")
     print_message(message)
 
 # Test
@@ -58,8 +59,8 @@ def command_debug(message):
 @bot.message_handler(func=lambda msg: msg.from_user.id in bannedUsers)
 def reject_user(message):
     cid = message.chat.id
-    username = message.from_user.username
-    bot.send_message(cid, f'El usuario {username} está baneadísimo ETERNAMENTE. Imposible que le dirija la palabra ❌')
+    user = user_from_message(message)
+    bot.send_message(cid, f'El usuario {user} está baneadísimo ETERNAMENTE. Imposible que le dirija la palabra ❌')
 
 # Control de spam
 @bot.message_handler(func=lambda msg: check_banned(msg.from_user.id))
@@ -111,7 +112,6 @@ def command_mute(message):
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
-    bot.send_chat_action(cid, 'upload_photo', timeout=90)
     mid = message.message_id
     args = message.text.split()
     if len(args) > 1:
@@ -119,7 +119,7 @@ def command_eevee(message):
     else:
         img = get_img('')
     try:
-        bot.send_chat_action(cid, 'typing')
+        bot.send_chat_action(cid, 'upload_photo', timeout=90)
         logger.debug(f'Enviando imagen {img} a usuario {cid}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
     except:
@@ -130,12 +130,11 @@ def command_eevee(message):
 @bot.message_handler(commands=['eeveehoy'])
 def command_eeveeToday(message):
     cid = message.chat.id
-    bot.send_chat_action(cid, 'upload_photo', timeout=90)
     mid = message.message_id
     img = get_today_img()
     if img:
         try:
-            bot.send_chat_action(cid, 'typing')
+            bot.send_chat_action(cid, 'upload_photo', timeout=90)
             logger.debug(f'Enviando imagen {img} a usuario {cid}...')
             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
         except:
