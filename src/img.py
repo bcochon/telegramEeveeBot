@@ -1,6 +1,7 @@
 import random
 import pickle
 from datetime import date
+import os
 
 from utils import logger
 from params import IMGS_DIR
@@ -11,19 +12,24 @@ from params import NEW_IMG_INDEX_PATH
 
 from imgs_data import imgs_dict
 
-def get_img(name) :
-    if name in imgs_dict:
+AVAILABLE_PETS = os.listdir(f'{IMGS_DIR}')
+
+def get_img(name, dir) :
+    if dir not in AVAILABLE_PETS : raise Exception(f"Invalid directory {dir}. Cannot get an image")
+    path = f'{IMGS_DIR}/{dir}'
+    imgs = os.listdir(path)
+    if name in imgs:
         img = name
     else:
-        img = random.choice(list(imgs_dict.keys()))
-    return f'{IMGS_DIR}/{img}'
+        img = random.choice(imgs)
+    return f'{path}/{img}'
 
 def get_today_img() :
     today = (date.today()).isoformat()
     validImgs = list(filter(lambda img: (imgs_dict[img] == today and NEW_IMG_PREFIX not in img), list(imgs_dict.keys())))
     if validImgs:
         img = random.choice(validImgs)
-        path = f'{IMGS_DIR}/{img}'
+        path = f'{IMGS_DIR}/eevee/{img}'
         year = imgs_dict[img].split('-')[0]
         return [path, year]
     return []
@@ -57,7 +63,7 @@ def is_valid_pic(photo) :
     return photo.file_size < MAX_FILE_SIZE
 
 def download_pic(name, pic) :
-    path = IMGS_DIR + '/' + name
+    path = IMGS_DIR + '/eevee/' + name
     with open(path, 'wb') as new_file:
         new_file.write(pic)
     logger.info(f"Guardada imagen {path}")

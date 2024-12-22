@@ -1,9 +1,11 @@
 from params import DEFAULT_LANG
 from params import BOT_OWNER
+from img import AVAILABLE_PETS
 from telebot import types as tele_types
 from utils import logger
 
 # =============================== COMMANDS ===============================
+
 privileged_commands = {
     'q'             : 'close bot execution',
     'toggledebug'   : 'toggle debug mode',
@@ -16,14 +18,22 @@ offline_commands = {
 
 commands_es = {
     'help'          : 'conocer los comandos disponibles 🤓',
-    'eevee'         : 'pedir foto de Eevee 🙏',
     'eeveehoy'      : 'pedir foto de Eevee un día como hoy',
     'togglemute'    : 'para ignorar mensajes que no entendí 🧐'
+}
+
+pet_commands = {
+    'es' : 'pedir foto de {} 🙏'
 }
 
 commands_langs = {
     'es' : commands_es
 }
+
+for lang in commands_langs :
+    for pet in AVAILABLE_PETS :
+        command = pet_commands[lang].format(pet.capitalize())
+        commands_langs[lang].update({pet : command})
 
 privileged_scope = tele_types.BotCommandScopeChat(chat_id=BOT_OWNER)
 

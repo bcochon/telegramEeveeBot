@@ -6,6 +6,7 @@ import telebot
 from params import *
 from utils import *
 import commands
+from img import AVAILABLE_PETS
 from img import get_img
 from img import get_today_img
 from img import try_download_pic
@@ -86,7 +87,7 @@ def command_help(message):
     bot.send_message(
         cid, 
         telebot.formatting.format_text(
-            "Bienvenido a *EeveeBot*\\. Este bot permite obtener imágenes de Eevee de una amplia galería con más de 100 fotos\\! 😮\n",
+            "Bienvenido a *EeveeBot*\\. Este bot permite obtener imágenes de Eevee & co de una amplia galería con más de 100 fotos\\! 😮\n",
             help_text,
             "Tené en cuenta que si interactuás con el bot en exceso \\(exceptuando comando /eevee\\), serás baneado por 60 segundos\\.\n",
             "Podés encontrar el [código](https://github.com/bcochon/telegramEeveeBot) detrás de este bot acá",
@@ -119,17 +120,18 @@ def command_mute(message):
     logger.debug(f'El usuario {user} solicitó activar/desactivar muteStatus en el chat {cid} (muteStatus={this_status})')
 
 # Pedir foto
-@bot.message_handler(commands=['eevee'])
+@bot.message_handler(commands=AVAILABLE_PETS)
 def command_eevee(message):
     cid = message.chat.id
     user = user_from_message(message)
     mid = message.message_id
     args = message.text.split()
-    logger.debug(f'El usuario {user} solicitó una imagen de Eevee')
+    pet = args[0].removeprefix('/')
+    logger.debug(f'El usuario {user} solicitó una imagen de {pet}')
     if len(args) > 1:
-        img = get_img(args[1])
+        img = get_img(args[1], pet)
     else:
-        img = get_img('')
+        img = get_img('', pet)
     try:
         bot.send_chat_action(cid, 'upload_photo', timeout=90)
         logger.debug(f'Enviando imagen {img} a usuario {user}...')
