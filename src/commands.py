@@ -73,6 +73,7 @@ def delete_privileged_commands(bot) :
     logger.debug('Comandos privilegiados eliminados')
 
 def set_commands(bot) :
+    bot.set_my_commands(commands=commands_list(commands_langs[DEFAULT_LANG]))
     set_privileged_commands(bot)
     set_regular_commands(bot)
 
