@@ -113,33 +113,39 @@ def command_mute(message):
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
+    username = user_from_message(message)
+    user = f'{username}({cid})'
     mid = message.message_id
     args = message.text.split()
+    logger.debug(f'El usuario {user} solicitó una imagen de Eevee')
     if len(args) > 1:
         img = get_img(args[1])
     else:
         img = get_img('')
     try:
         bot.send_chat_action(cid, 'upload_photo', timeout=90)
-        logger.debug(f'Enviando imagen {img} a usuario {cid}...')
+        logger.debug(f'Enviando imagen {img} a usuario {user}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
     except:
-        logger.error(f'Error al enviar {img} a usuario {cid}...')
+        logger.error(f'Error al enviar {img} a usuario {user}')
         bot.reply_to(message, "Ups, hubo un problema 😔")
 
 # Pedir foto hoy
 @bot.message_handler(commands=['eeveehoy'])
 def command_eeveeToday(message):
     cid = message.chat.id
+    username = user_from_message(message)
+    user = f'{username}({cid})'
     mid = message.message_id
     img = get_today_img()
+    logger.debug(f'El usuario {user} solicitó una imagen de Eevee un día como hoy')
     if img:
         try:
             bot.send_chat_action(cid, 'upload_photo', timeout=90)
-            logger.debug(f'Enviando imagen {img} a usuario {cid}...')
+            logger.debug(f'Enviando imagen {img} a usuario {user}...')
             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
         except:
-            logger.error('Error al enviar {img} a usuario {cid}...')
+            logger.error(f'Error al enviar {img} a usuario {user}')
             bot.reply_to(message, "Ups, hubo un problema 😔")
     else:
         bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
@@ -193,7 +199,7 @@ def command_quitted(message):
 @bot.message_handler(func=lambda msg: msg.text.lower() == 'hola')
 def command_hola(message):
     username = name_from_user(message.from_user) 
-    bot.reply_to(message, f"Hola {username} 🤙")
+    bot.reply_to(message, f"Hola 🤙")
     check_spam(message.from_user.id)
 
 # Default
@@ -205,7 +211,7 @@ def command_default_msg(message):
 # Default (no texto)
 @bot.message_handler(content_types=ALLSCP, func=lambda msg: (not is_answering_pic(msg)) and (not muteStatus))
 def command_default(message):
-    bot.reply_to(message, "Qué me mandaba \\(?")
+    bot.reply_to(message, "Qué me mandaba (?")
     check_spam(message.from_user.id)
 
 

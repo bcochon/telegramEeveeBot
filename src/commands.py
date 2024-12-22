@@ -6,7 +6,8 @@ from utils import logger
 # =============================== COMMANDS ===============================
 privileged_commands = {
     'q'             : 'close bot execution',
-    'toggledebug'   : 'toggle debug mode'
+    'toggledebug'   : 'toggle debug mode',
+    'upload'        : 'upload new pics'
 }
 
 offline_commands = {

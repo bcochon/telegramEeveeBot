@@ -60,7 +60,7 @@ def download_pic(name, pic) :
     path = IMGS_DIR + '/' + name
     with open(path, 'wb') as new_file:
         new_file.write(pic)
-    logger.info(f"Guardada imagen {path}\n")
+    logger.info(f"Guardada imagen {path}")
 
 def try_download(file, bot) :
     if not is_valid_pic(file) :
@@ -70,7 +70,8 @@ def try_download(file, bot) :
         downloadedFile = bot.download_file(fileInfo.file_path)
         name = create_new_img_name()
         download_pic(name, downloadedFile)
-        return f"Imagen descargada con exito! Yippie! \\('{name}'\\)"
+        logger.debug(f'Se descargó la imagen {name}')
+        return f"Imagen descargada con exito! Yippie! ('{name}')"
     
 def try_download_pic(photos, bot) :
     photo = photos[-1] # Best quality in -1 index
