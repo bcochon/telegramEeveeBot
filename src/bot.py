@@ -136,8 +136,9 @@ def command_eevee(message):
         bot.send_chat_action(cid, 'upload_photo', timeout=90)
         logger.debug(f'Enviando imagen {img} a usuario {user}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
-    except:
+    except Exception as e:
         logger.error(f'Error al enviar {img} a usuario {user}')
+        log_exception(e)
         bot.reply_to(message, "Ups, hubo un problema 😔")
 
 # Pedir foto hoy
@@ -153,7 +154,7 @@ def command_eeveeToday(message):
             bot.send_chat_action(cid, 'upload_photo', timeout=90)
             logger.debug(f'Enviando imagen {img} a usuario {user}...')
             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
-        except:
+        except Exception as e:
             logger.error(f'Error al enviar {img} a usuario {user}')
             bot.reply_to(message, "Ups, hubo un problema 😔")
     else:
@@ -199,7 +200,7 @@ def command_quitted(message):
             bot.send_message(cid, "Finalizando ejecución...")
             bot.stop_bot()
             logger.debug("Finalizando ejecución...")
-        except:
+        except Exception as e:
             logger.error("No se pudo finalizar la ejecución")
     else:
         bot.reply_to(message, "Finalización de ejecución cancelada")

@@ -9,8 +9,12 @@ from time import time
 logging.config.fileConfig(LOGGER_CONFIG_PATH)
 logger = logging.getLogger('EeveeBot')
 loggerIgnore = logging.getLogger('Ignore')
+loggerErrors = logging.getLogger('Errors')
 
 ALLSCP = ['audio', 'document', 'video', 'videonote', 'voice', 'location', 'contact', 'sticker', 'photo']
+
+def log_exception(exception) :
+    loggerErrors.error('Error {0}'.format(str(exception)))
 
 def is_answering_pic(message) :
     if message.reply_to_message:
