@@ -79,23 +79,12 @@ def warn_ban(message):
 def command_help(message):
     cid = message.chat.id
     lang = message.from_user.language_code
-    cms = commands.commands_langs[lang]
-    help_text = "Estos son los comandos que podés usar: \n"
-    for key in cms:  # generate help text out of the commands dictionary defined at the top
-        help_text += "/" + key + " — "
-        help_text += cms[key] + "\n"
-    bot.send_message(
-        cid, 
-        telebot.formatting.format_text(
-            "Bienvenido a *EeveeBot*\\. Este bot permite obtener imágenes de Eevee & co de una amplia galería con más de 100 fotos\\! 😮\n",
-            help_text,
-            "Tené en cuenta que si interactuás con el bot en exceso \\(exceptuando comando /eevee\\), serás baneado por 60 segundos\\.\n",
-            "Podés encontrar el [código](https://github.com/bcochon/telegramEeveeBot) detrás de este bot acá",
-            separator="\n" # separator separates all strings
-        ),
-        parse_mode='MarkdownV2',
-        link_preview_options=tele_types.LinkPreviewOptions(is_disabled=True)
-    )  # send the generated help page
+    txt = "Bienvenido a <b>EeveeBot</b>. Este bot permite obtener imágenes de Eevee & co de una amplia galería con más de 200 fotos! 😮\n\n"
+    txt += "Estos son los comandos que podés usar:\n\n"
+    txt += commands.cms_menu(lang)+'\n'
+    txt += "Tené en cuenta que si interactuás con el bot en exceso (exceptuando comandos de fotos), serás baneado por 60 segundos.\n\n"
+    txt += 'Podés encontrar el <a href="https://github.com/bcochon/telegramEeveeBot">código</a> detrás de este bot acá'
+    bot.send_message(cid, txt, parse_mode='HTML', link_preview_options=tele_types.LinkPreviewOptions(is_disabled=True))  # send the generated help page
     check_spam(message.from_user.id)
 
 # Start
@@ -103,6 +92,16 @@ def command_help(message):
 def command_start(message):
     bot.reply_to(message, "Bienvenido jeje")
     command_help(message)
+
+# Pets commands
+@bot.message_handler(commands=['pets'])
+def command_pets(message):
+    lang = message.from_user.language_code
+    txt = "Mascotas disponibles:\n"
+    for pet in commands.commands_get(lang).pets :
+        txt += f' /{pet}\n'
+    bot.reply_to(message, txt)
+    check_spam(message.from_user.id)
 
 # Mute
 @bot.message_handler(commands=['togglemute'])
