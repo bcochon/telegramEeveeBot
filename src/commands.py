@@ -67,6 +67,7 @@ def set_commands(bot) :
     set_regular_commands(bot)
 
 def delete_commands(bot) :
+    bot.delete_my_commands()
     delete_privileged_commands(bot)
     delete_regular_commands(bot)
 
