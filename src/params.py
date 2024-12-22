@@ -1,9 +1,7 @@
 DEFAULT_LANG = 'es'
 LOGGER_CONFIG_PATH = '../logs/.conf'
-bannedUsers = []
-debugginMode = False
 BOT_OWNER = 6390834871
-muteStatus = False
+
 IMGS_DIR = "../imgs"
 MAX_FILE_SIZE = 10 * 10**6 # 10MB
 NEW_IMG_PREFIX = "imagenCargadaPorBot-"

@@ -19,6 +19,9 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 bot = telebot.TeleBot(BOT_TOKEN)
+bannedUsers = []
+debugginMode = False
+muteStatus = []
 
 # Definir comandos
 commands.set_commands(bot)
@@ -48,7 +51,7 @@ def warn_debug(message):
     check_spam(message.from_user.id)
 
 # Toggle Modo Debug
-@bot.message_handler(commands=['toggleDebug'], func=lambda msg: from_bot_owner(msg))
+@bot.message_handler(commands=['toggledebug'], func=lambda msg: from_bot_owner(msg))
 def command_debug(message):
     debugginMode = not debugginMode
     if debugginMode :
@@ -103,18 +106,27 @@ def command_start(message):
 # Mute
 @bot.message_handler(commands=['togglemute'])
 def command_mute(message):
-    muteStatus = not muteStatus
-    if muteStatus :
-        bot.reply_to(message, "🤐")
+    cid = message.chat.id
+    uid = message.from_user.id
+    username = user_from_message(message)
+    user = f'{username}({uid})'
+    if cid not in muteStatus :
+        muteStatus.append(cid)
+        bot.reply_to(message, "Muted 🤐")
+        this_status = 'muted'
     else :
+        muteStatus.remove(cid)
         bot.reply_to(message, "We're so back 🤩")
+        this_status = 'unmuted'
+    logger.debug(f'El usuario {user} solicitó activar/desactivar muteStatus en el chat {cid} (muteStatus={this_status})')
 
 # Pedir foto
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
+    uid = message.from_user.id
     username = user_from_message(message)
-    user = f'{username}({cid})'
+    user = f'{username}({uid})'
     mid = message.message_id
     args = message.text.split()
     logger.debug(f'El usuario {user} solicitó una imagen de Eevee')
