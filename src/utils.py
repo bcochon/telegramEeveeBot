@@ -28,8 +28,9 @@ def message_date_string(message) :
 
 def user_from_message(message) :
     user = message.from_user.username
-    if user: return user
-    return message.chat.id
+    if not user: user = message.chat.id
+    uid = message.from_user.id
+    return f'{user}({uid})' 
 
 def name_from_user(user) :
     name = user.first_name

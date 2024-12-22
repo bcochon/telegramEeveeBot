@@ -107,9 +107,7 @@ def command_start(message):
 @bot.message_handler(commands=['togglemute'])
 def command_mute(message):
     cid = message.chat.id
-    uid = message.from_user.id
-    username = user_from_message(message)
-    user = f'{username}({uid})'
+    user = user_from_message(message)
     if cid not in muteStatus :
         muteStatus.append(cid)
         bot.reply_to(message, "Muted 🤐")
@@ -124,9 +122,7 @@ def command_mute(message):
 @bot.message_handler(commands=['eevee'])
 def command_eevee(message):
     cid = message.chat.id
-    uid = message.from_user.id
-    username = user_from_message(message)
-    user = f'{username}({uid})'
+    user = user_from_message(message)
     mid = message.message_id
     args = message.text.split()
     logger.debug(f'El usuario {user} solicitó una imagen de Eevee')
@@ -146,8 +142,7 @@ def command_eevee(message):
 @bot.message_handler(commands=['eeveehoy'])
 def command_eeveeToday(message):
     cid = message.chat.id
-    username = user_from_message(message)
-    user = f'{username}({cid})'
+    user = user_from_message(message)
     mid = message.message_id
     img = get_today_img()
     logger.debug(f'El usuario {user} solicitó una imagen de Eevee un día como hoy')
