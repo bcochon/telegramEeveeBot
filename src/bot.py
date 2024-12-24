@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 
 import telebot
+from telebot import types as teletypes
 
 from params import *
 from utils import *
@@ -32,7 +33,7 @@ logger.info("Bot Online")
 
 # Message handlers
 # Ignorar mensajes antiguos
-@bot.message_handler(func=lambda msg: sent_secs_ago(msg, 10))
+@bot.message_handler(func=lambda msg: sent_secs_ago(msg, 30))
 def ignore(message):
     user = user_from_message(message)
     date = message_date_string(message)
@@ -84,7 +85,7 @@ def command_help(message):
     txt += commands.cms_menu(lang)+'\n'
     txt += "Tené en cuenta que si interactuás con el bot en exceso (exceptuando comandos de fotos), serás baneado por 60 segundos.\n\n"
     txt += 'Podés encontrar el <a href="https://github.com/bcochon/telegramEeveeBot">código</a> detrás de este bot acá'
-    bot.send_message(cid, txt, parse_mode='HTML', link_preview_options=tele_types.LinkPreviewOptions(is_disabled=True))  # send the generated help page
+    bot.send_message(cid, txt, parse_mode='HTML', link_preview_options=teletypes.LinkPreviewOptions(is_disabled=True))  # send the generated help page
     check_spam(message.from_user.id)
 
 # Start
@@ -125,13 +126,14 @@ def command_eevee(message):
     user = user_from_message(message)
     mid = message.message_id
     args = message.text.split()
-    pet = args[0].removeprefix('/')
+    pet = args[0].removeprefix('/').replace('@EeveeGalleryBot','')
     logger.debug(f'El usuario {user} solicitó una imagen de {pet}')
-    if len(args) > 1:
-        img = get_img(args[1], pet)
-    else:
-        img = get_img('', pet)
     try:
+        img = None
+        if len(args) > 1:
+            img = get_img(args[1], pet)
+        else:
+            img = get_img('', pet)
         bot.send_chat_action(cid, 'upload_photo', timeout=90)
         logger.debug(f'Enviando imagen {img} a usuario {user}...')
         bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)

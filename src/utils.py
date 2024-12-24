@@ -1,4 +1,3 @@
-from telebot import types as tele_types
 import logging
 import logging.config
 from params import BOT_OWNER
