@@ -98,11 +98,20 @@ def command_start(message):
 @bot.message_handler(commands=['pets'])
 def command_pets(message):
     lang = message.from_user.language_code
-    txt = "Mascotas disponibles:\n"
+    buttons = []
     for pet in commands.commands_get(lang).pets :
-        txt += f' /{pet}\n'
-    bot.reply_to(message, txt)
+        buttons.append(teletypes.InlineKeyboardButton(f'{pet}', callback_data=f'cb_pets_{pet}'))
+    markup = teletypes.InlineKeyboardMarkup(row_width=2)
+    markup.add(*buttons)
+    bot.reply_to(message, 'Elegí qué fotos:', reply_markup=markup)
     check_spam(message.from_user.id)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('cb_pets_'))
+def callback_query(call : teletypes.CallbackQuery):
+    cid = call.message.chat.id
+    command = '/'+call.data.removeprefix('cb_pets_')
+    message = bot.send_message(cid, command)
+    command_eevee(message)
 
 # Mute
 @bot.message_handler(commands=['togglemute'])
