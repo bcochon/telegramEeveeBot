@@ -64,3 +64,6 @@ def message_info_string(message):
 
 def from_bot_owner(message) :
     return message.from_user.id == BOT_OWNER
+
+def now_timestamp() :
+    return int(time())

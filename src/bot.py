@@ -8,14 +8,8 @@ from params import *
 from utils import *
 import commands
 from img import AVAILABLE_PETS
-from img import get_img
-from img import get_today_img
-from img import try_download_pic
-from img import try_download
-from user_handler import check_banned
-from user_handler import check_spam
-from user_handler import get_user_step
-from user_handler import set_user_step
+from img import get_img, get_today_img, try_download_pic, try_download
+from user_handler import check_banned, check_spam, get_user_step, set_user_step, use_groupchat, reached_limit
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -29,7 +23,6 @@ muteStatus = []
 commands.set_commands(bot)
 
 logger.info("Bot Online")
-
 
 # Message handlers
 # Ignorar mensajes antiguos
@@ -109,9 +102,17 @@ def command_pets(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('cb_pets_'))
 def callback_query(call : teletypes.CallbackQuery):
     cid = call.message.chat.id
+    if call.message.chat.type == 'group':
+        uid = call.from_user.id
+        if reached_limit(uid, cid):
+            bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
+            return 1
+        use_groupchat(uid, cid, now_timestamp())
+    username = name_from_user(call.from_user)
     command = '/'+call.data.removeprefix('cb_pets_')
-    message = bot.send_message(cid, command)
-    command_eevee(message)
+    message = bot.send_message(cid, f'{username} pidió una foto a través del menu /pets')
+    cm_message = bot.reply_to(message, command)
+    command_eevee(cm_message)
 
 # Mute
 @bot.message_handler(commands=['togglemute'])
@@ -130,8 +131,17 @@ def command_mute(message):
 
 # Pedir foto
 @bot.message_handler(commands=AVAILABLE_PETS)
-def command_eevee(message):
+def command_eevee(message : teletypes.Message):
     cid = message.chat.id
+    try :
+        if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
+            uid = message.from_user.id
+            if reached_limit(uid, cid):
+                bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
+                return 1
+            use_groupchat(uid, cid, now_timestamp())
+    except Exception as e:
+        log_exception(e)
     user = user_from_message(message)
     mid = message.message_id
     args = message.text.split()
@@ -155,6 +165,12 @@ def command_eevee(message):
 @bot.message_handler(commands=['eeveehoy'])
 def command_eeveeToday(message):
     cid = message.chat.id
+    if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
+        uid = message.from_user.id
+        if reached_limit(uid, cid):
+            bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
+            return 1
+        use_groupchat(uid, cid, now_timestamp())
     user = user_from_message(message)
     mid = message.message_id
     img = get_today_img()
