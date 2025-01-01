@@ -24,3 +24,7 @@ if ns :
         if completeDate:
             date = date_formatter(completeDate.split()[0])
             imgs_dict.update({item.Name : date})
+
+# dates = list(map((lambda date : date[5:]), imgs_dict.values()))
+
+# print(list(filter(lambda date : date == '31-12', dates)))

@@ -163,7 +163,7 @@ def command_eevee(message : teletypes.Message):
 
 # Pedir foto hoy
 @bot.message_handler(commands=['eeveehoy'])
-def command_eeveeToday(message):
+def command_eeveeToday(message : teletypes.Message):
     cid = message.chat.id
     if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
         uid = message.from_user.id
@@ -178,10 +178,10 @@ def command_eeveeToday(message):
     if img:
         try:
             bot.send_chat_action(cid, 'upload_photo', timeout=90)
-            logger.debug(f'Enviando imagen {img} a usuario {user}...')
+            logger.debug(f'Enviando imagen {img[0]} a usuario {user}...')
             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
         except Exception as e:
-            logger.error(f'Error al enviar {img} a usuario {user}')
+            logger.error(f'Error al enviar {img[0]} a usuario {user}')
             bot.reply_to(message, "Ups, hubo un problema 😔")
     else:
         bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")

@@ -26,13 +26,18 @@ def get_img(name, dir) :
 
 def get_today_img() :
     today = (date.today()).isoformat()
-    validImgs = list(filter(lambda img: (imgs_dict[img] == today and NEW_IMG_PREFIX not in img), list(imgs_dict.keys())))
+    validImgs = list(filter(lambda img: (same_date(imgs_dict[img], today) and (NEW_IMG_PREFIX not in img)), list(imgs_dict.keys())))
     if validImgs:
         img = random.choice(validImgs)
         path = f'{IMGS_DIR}/eevee/{img}'
         year = imgs_dict[img].split('-')[0]
         return [path, year]
     return []
+
+def same_date(date1 : str, date2 : str) :
+    [ year1, month1, day1 ] = date1.split('-')
+    [ year2, month2, day2 ] = date2.split('-')
+    return day1 == day2 and month1 == month2
 
 def check_newImageIndex() :
     botImgs = list(filter(lambda img: (NEW_IMG_PREFIX in img), list(imgs_dict.keys())))
