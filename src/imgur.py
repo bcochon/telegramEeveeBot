@@ -78,4 +78,5 @@ def get_album_image(album_id: str, image_id: str) -> dict :
 
 
 if __name__ == '__main__' :
-    ...
+    imgs = get_relevant_albums()
+    print(imgs[3])
