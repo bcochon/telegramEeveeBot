@@ -1,3 +1,5 @@
 python-dotenv
 pyTelegramBotAPI
 requests
+Flask
+waitress

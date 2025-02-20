@@ -1,6 +1,8 @@
 import os
 
 from dotenv import load_dotenv
+from flask import Flask, request
+from waitress import serve
 import telebot
 from telebot import types as teletypes
 
@@ -12,6 +14,13 @@ from user_handler import check_banned, check_spam, get_user_step, set_user_step,
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+PORT = os.getenv('PORT', 4000)
+
+# Flask app webhook
+app = Flask('EeveeTelebot')
+@app.route('/', methods=['GET'])
+def webhook():
+    return 'Running'
 
 bot = telebot.TeleBot(BOT_TOKEN)
 bannedUsers = []
@@ -250,6 +259,8 @@ def command_default(message):
     check_spam(message.from_user.id)
 
 
-bot.infinity_polling()
-logger.info("Ejecución finalizada")
-commands.set_offline(bot)
+if __name__ == "__main__":
+    serve(app, port=PORT)
+    bot.infinity_polling()
+    logger.info("Ejecución finalizada")
+    commands.set_offline(bot)
