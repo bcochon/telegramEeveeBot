@@ -7,8 +7,7 @@ from telebot import types as teletypes
 from params import *
 from utils import *
 import commands
-from img import AVAILABLE_PETS
-from img import get_img, get_today_img, try_download_pic, try_download
+from img import AVAILABLE_PETS, get_img
 from user_handler import check_banned, check_spam, get_user_step, set_user_step, use_groupchat, reached_limit
 
 load_dotenv()
@@ -130,7 +129,7 @@ def command_mute(message):
     logger.debug(f'El usuario {user} solicitó activar/desactivar muteStatus en el chat {cid} (muteStatus={this_status})')
 
 # Pedir foto
-@bot.message_handler(commands=AVAILABLE_PETS)
+@bot.message_handler(commands=list(AVAILABLE_PETS.keys()))
 def command_eevee(message : teletypes.Message):
     cid = message.chat.id
     try :
@@ -150,63 +149,63 @@ def command_eevee(message : teletypes.Message):
     try:
         img = None
         if len(args) > 1:
-            img = get_img(args[1], pet)
+            img = get_img(pet=pet, image_id=args[1])
         else:
-            img = get_img('', pet)
+            img = get_img(pet)
         bot.send_chat_action(cid, 'upload_photo', timeout=90)
         logger.debug(f'Enviando imagen {img} a usuario {user}...')
-        bot.send_photo(cid, open(img,'rb'), reply_to_message_id=mid)
+        bot.send_photo(cid, img, reply_to_message_id=mid)
     except Exception as e:
         logger.error(f'Error al enviar {img} a usuario {user}')
         log_exception(e)
         bot.reply_to(message, "Ups, hubo un problema 😔")
 
-# Pedir foto hoy
-@bot.message_handler(commands=['eeveehoy'])
-def command_eeveeToday(message : teletypes.Message):
-    cid = message.chat.id
-    if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
-        uid = message.from_user.id
-        if reached_limit(uid, cid):
-            bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
-            return 1
-        use_groupchat(uid, cid, now_timestamp())
-    user = user_from_message(message)
-    mid = message.message_id
-    img = get_today_img()
-    logger.debug(f'El usuario {user} solicitó una imagen de Eevee un día como hoy')
-    if img:
-        try:
-            bot.send_chat_action(cid, 'upload_photo', timeout=90)
-            logger.debug(f'Enviando imagen {img[0]} a usuario {user}...')
-            bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
-        except Exception as e:
-            logger.error(f'Error al enviar {img[0]} a usuario {user}')
-            bot.reply_to(message, "Ups, hubo un problema 😔")
-    else:
-        bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
+# # Pedir foto hoy
+# @bot.message_handler(commands=['eeveehoy'])
+# def command_eeveeToday(message : teletypes.Message):
+#     cid = message.chat.id
+#     if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
+#         uid = message.from_user.id
+#         if reached_limit(uid, cid):
+#             bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
+#             return 1
+#         use_groupchat(uid, cid, now_timestamp())
+#     user = user_from_message(message)
+#     mid = message.message_id
+#     img = get_today_img()
+#     logger.debug(f'El usuario {user} solicitó una imagen de Eevee un día como hoy')
+#     if img:
+#         try:
+#             bot.send_chat_action(cid, 'upload_photo', timeout=90)
+#             logger.debug(f'Enviando imagen {img[0]} a usuario {user}...')
+#             bot.send_photo(cid, open(img[0],'rb'), caption=f'Un día como hoy en {img[1]}...', reply_to_message_id=mid)
+#         except Exception as e:
+#             logger.error(f'Error al enviar {img[0]} a usuario {user}')
+#             bot.reply_to(message, "Ups, hubo un problema 😔")
+#     else:
+#         bot.reply_to(message, "No hay una foto de Eevee un día como hoy en el calendario 😔")
 
-# Subir foto
-@bot.message_handler(commands=['upload'], func=lambda msg: from_bot_owner(msg))
-def command_upload(message):
-    cid = message.chat.id
-    uid = message.from_user.id
-    bot.send_message(cid, "Envía la imagen a añadir a la galería")
-    set_user_step(uid, 1)
+# # Subir foto
+# @bot.message_handler(commands=['upload'], func=lambda msg: from_bot_owner(msg))
+# def command_upload(message):
+#     cid = message.chat.id
+#     uid = message.from_user.id
+#     bot.send_message(cid, "Envía la imagen a añadir a la galería")
+#     set_user_step(uid, 1)
 
-@bot.message_handler(content_types=ALLSCP, func=lambda msg:  get_user_step(msg.from_user.id) == 1)
-def command_uploaded(message):
-    cid = message.chat.id
-    bot.send_chat_action(cid, 'typing', timeout=90)
-    uid = message.from_user.id
-    if message.photo:
-        result = try_download_pic(message.photo, bot)
-    elif message.document:
-        result = try_download(message.document, bot)
-    else:
-        result = "Creo que eso no es una foto... cancelando operación"
-    bot.reply_to(message, result)
-    set_user_step(uid, 0)
+# @bot.message_handler(content_types=ALLSCP, func=lambda msg:  get_user_step(msg.from_user.id) == 1)
+# def command_uploaded(message):
+#     cid = message.chat.id
+#     bot.send_chat_action(cid, 'typing', timeout=90)
+#     uid = message.from_user.id
+#     if message.photo:
+#         result = try_download_pic(message.photo, bot)
+#     elif message.document:
+#         result = try_download(message.document, bot)
+#     else:
+#         result = "Creo que eso no es una foto... cancelando operación"
+#     bot.reply_to(message, result)
+#     set_user_step(uid, 0)
 
 # Finalizar ejecución
 @bot.message_handler(commands=['q'], func=lambda msg: from_bot_owner(msg))

@@ -32,7 +32,6 @@ commands_es = CommandsByLanguage(
     privileged = {
         'q'             : 'close bot execution',
         'toggledebug'   : 'toggle debug mode',
-        'upload'        : 'upload new pics'
     },
     offline = {
         'offline'       : 'bot apagado ahora mismo 😴'
@@ -42,8 +41,7 @@ commands_es = CommandsByLanguage(
         'pets'          : 'ver galerías disponibles 🐶'
     },
     extra = {
-        'eeveehoy'      : 'pedir foto de Eevee un día como hoy',
-        'togglemute'    : 'para ignorar mensajes que no entendí 🧐'
+        'togglemute'    : 'para ignorar mensajes que no entendí 🧐',
     },
     pet_format = 'pedir foto de {}'
 )
