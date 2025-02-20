@@ -16,7 +16,7 @@ class CommandsByLanguage :
         self.menu = menu
         self.extra = extra
         self.pets = {}
-        for pet in AVAILABLE_PETS :
+        for pet in list(AVAILABLE_PETS.keys()) :
             command = pet_format.format(pet.replace('_',' ').capitalize())
             self.pets.update({pet : command})
         commands_langs.update({language : self})

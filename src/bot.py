@@ -1,8 +1,6 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask, request
-from waitress import serve
 import telebot
 from telebot import types as teletypes
 
@@ -11,18 +9,13 @@ from utils import *
 import commands
 from img import AVAILABLE_PETS, get_img
 from user_handler import check_banned, check_spam, get_user_step, set_user_step, use_groupchat, reached_limit
+import listen
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-PORT = os.getenv('PORT', 4000)
-
-# Flask app webhook
-app = Flask('EeveeTelebot')
-@app.route('/', methods=['GET'])
-def webhook():
-    return 'Running'
 
 bot = telebot.TeleBot(BOT_TOKEN)
+
 bannedUsers = []
 debugginMode = False
 muteStatus = []
@@ -110,12 +103,8 @@ def command_pets(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('cb_pets_'))
 def callback_query(call : teletypes.CallbackQuery):
     cid = call.message.chat.id
-    if call.message.chat.type == 'group':
-        uid = call.from_user.id
-        if reached_limit(uid, cid):
-            bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
-            return 1
-        use_groupchat(uid, cid, now_timestamp())
+    if check_groupchat_uses(call.message, call.from_user.id, cid):
+        return
     username = name_from_user(call.from_user)
     command = '/'+call.data.removeprefix('cb_pets_')
     message = bot.send_message(cid, f'{username} pidió una foto a través del menu /pets')
@@ -141,15 +130,8 @@ def command_mute(message):
 @bot.message_handler(commands=list(AVAILABLE_PETS.keys()))
 def command_eevee(message : teletypes.Message):
     cid = message.chat.id
-    try :
-        if message.chat.type == 'group' and message.from_user.id != bot.bot_id:
-            uid = message.from_user.id
-            if reached_limit(uid, cid):
-                bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
-                return 1
-            use_groupchat(uid, cid, now_timestamp())
-    except Exception as e:
-        log_exception(e)
+    if check_groupchat_uses(message, message.from_user.id, cid) :
+        return
     user = user_from_message(message)
     mid = message.message_id
     args = message.text.split()
@@ -238,6 +220,7 @@ def command_quitted(message):
             logger.error("No se pudo finalizar la ejecución")
     else:
         bot.reply_to(message, "Finalización de ejecución cancelada")
+    commands.set_offline(bot)
 
 # Hola
 @bot.message_handler(func=lambda msg: msg.text.lower() == 'hola')
@@ -259,8 +242,22 @@ def command_default(message):
     check_spam(message.from_user.id)
 
 
+# ===================================== FUNCTIONS =====================================
+def check_groupchat_uses(message, uid, cid) :
+    if message.chat.type == 'group':
+        if reached_limit(uid, cid):
+            try:
+                bot.send_message(uid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!')
+                return 1
+            except Exception as e:
+                logger.warning('Tried to send a message to a user private messages for reaching groupchat limit: ', e)
+                bot.send_message(cid, f'Ups... alcanzaste el límite de usos en un chat grupal (vas a poder de nuevo en 12 hs o hasta que se apague el bot). Pero podés seguir usándome por mesajes privados mientras tanto!\n\nℹ Este mensaje debió enviarse al chat privado, pero el usuario debe iniciar una conversación con el bot para permitir eso')
+                return 1
+        use_groupchat(uid, cid, now_timestamp())
+    return 0
+
 if __name__ == "__main__":
-    serve(app, port=PORT)
+    listen.start()
     bot.infinity_polling()
     logger.info("Ejecución finalizada")
     commands.set_offline(bot)
